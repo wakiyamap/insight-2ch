@@ -6,16 +6,21 @@ class BlocksController extends AppController {
 
     public function index() {
 
+      
     }
 
-    public function getajax() {
-      $this->layout = 'ajax';
+    public function getblockdata() {
+      $autoLayout = false;
+      $dbBlockData = $this->Block->find('all',array(
+        'order' => array('Block.height' => 'desc'),
+        'limit' => 6, 
+      ));
+      $this->set("dbBlockData",$dbBlockData);
 
     }
 
     public function add() {
-      
-      //todo DBから最新のデータを引っ張ってくる
+      //$this->autoRender=false;
       $dbBlockData = $this->Block->find('first',array(
         'order' => array('Block.height' => 'desc'),
       ));
@@ -31,7 +36,8 @@ class BlocksController extends AppController {
               'block_hash' => $nextBlockData['hash'],
               'difficulty' => $nextBlockData['difficulty'],
               'size' => $nextBlockData['size'],
-              'time' => date('Y-m-d H:i:s',$nextBlockData['time']+28800),
+              'tx_count' => count($nextBlockData['tx']),
+              'time' => date('Y-m-d H:i:s',$nextBlockData['time']),
             )
           );
           $this->Block->save($new_blockData) or die('{"error":"failed_save_address"}');
