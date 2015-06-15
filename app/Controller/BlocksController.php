@@ -9,16 +9,37 @@ class BlocksController extends AppController {
       
     }
 
-    public function detail() {
-      //$autoLayout = false;
+    public function detail($height) {
       $dbBlockData = $this->Block->find('all',array(
-        'order' => array('Block.height' => 'desc'),
-        'limit' => 6, 
-      ));
-      $dbBlockData = array_reverse($dbBlockData);
-      $this->viewClass = 'Json';
-      $this->set(compact('dbBlockData'));
-      $this->set('_serialize','dbBlockData');
+		'conditions' => array('Block.block_hash' => $height),
+		'limit' => 1
+	  ));
+	  $this->set("dbBlockData",$dbBlockData);
+
+	  if($dbBlockData == null){
+	      $dbBlockData = $this->Block->find('all',array(
+			'conditions' => array('Block.height' => $height),
+			'limit' => 1
+		  ));
+		  if($dbBlockData['0']['Block']['id'] == $height){
+	 	  	$this->set("dbBlockData",$dbBlockData);
+		  } else {
+			throw new NotFoundException(); //404error
+		  }
+	  }
+	  $nextBlockData = $this->Block->findById($dbBlockData['0']['Block']['id']+1);
+	  $this->set("nextBlockData",$nextBlockData);
+	  $prevBlockData = $this->Block->findById($dbBlockData['0']['Block']['id']-1);
+	  $this->set("prevBlockData",$prevBlockData);
+    }
+
+    public function getblockdetaildata($hash) {
+      $autoLayout = false;
+      if($BlockData = @file_get_contents("http://160.16.76.211:3000/api/block/".$hash)){
+	    $this->set("BlockData",$BlockData);
+	  } else {
+	  	$this->set("BlockData","error");
+	  }
     }
 
     public function getblockdata() {
