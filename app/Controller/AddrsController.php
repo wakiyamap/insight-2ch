@@ -1,7 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
  
-class TxsController extends AppController {
+class AddrsController extends AppController {
     var $components = array("RequestHandler");
 
     public function index() {
@@ -9,12 +9,12 @@ class TxsController extends AppController {
       
     }
 
-    public function detail($txid) {
-      if($TxData = @file_get_contents("http://160.16.76.211:3000/api/tx/".$txid)){
-		$TxData = json_decode($TxData,true);
-	    $this->set("TxData",$TxData);
+    public function detail($address) {
+      if($AddrData = @file_get_contents("http://160.16.76.211:3000/api/addr/".$address)){
+		$AddrData = json_decode($AddrData,true);
+	    $this->set("AddrData",$AddrData);
 	  } else {
-	  	$this->set("TxData","error");
+	  	$this->set("AddrData","error");
 	  }
     }
 
